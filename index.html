@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>步行街工作室 · Walking Street Studio</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0d1117; --panel:#161b22; --card:#1c2333; --line:#30363d;
+    --text:#e6edf3; --sub:#8b949e; --green:#3fb950; --green-d:#238636;
+    --gold:#d29922; --gold-d:#9e6a03;
+  }
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh;
+    background-image:
+      repeating-linear-gradient(0deg,transparent 0 31px,rgba(48,54,61,.14) 31px 32px),
+      repeating-linear-gradient(90deg,transparent 0 31px,rgba(48,54,61,.14) 31px 32px);
+  }
+  /* ===== 导航 ===== */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(13,17,23,.95);border-bottom:3px solid var(--green)}
+  .nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:60px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:bold;color:var(--green);font-size:17px;cursor:pointer}
+  .logo .cube{width:30px;height:30px;background:var(--green);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--bg)}
+  .menu{display:flex;list-style:none;gap:2px}
+  .menu a{display:block;padding:10px 15px;color:var(--sub);font-size:14px;cursor:pointer;border:2px solid transparent}
+  .menu a:hover,.menu a.on{color:var(--green);background:rgba(63,185,80,.08);border-color:var(--green-d)}
+  .burger{display:none;background:none;border:2px solid var(--line);color:var(--text);width:38px;height:38px;font-size:18px;cursor:pointer}
+  /* ===== 主体 ===== */
+  .wrap{max-width:1100px;margin:0 auto;padding:80px 20px 30px}
+  .page{display:none;animation:fade .25s ease}
+  .page.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .crumb{font-size:12px;color:var(--sub);margin-bottom:6px}
+  .crumb b{color:var(--gold)}
+  .page-title{font-size:26px;color:var(--green);margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid var(--line)}
+  /* Hero */
+  .hero{text-align:center;padding:50px 20px 40px;border:2px solid var(--line);background:linear-gradient(180deg,rgba(63,185,80,.06),transparent);margin-bottom:28px}
+  .hero h1{font-size:34px;margin-bottom:12px}
+  .hero h1 span{color:var(--green)}
+  .hero p{color:var(--sub);max-width:560px;margin:0 auto 26px;line-height:1.8;font-size:15px}
+  .stats{display:flex;justify-content:center;gap:40px}
+  .stat b{display:block;font-size:30px;color:var(--gold)}
+  .stat i{font-style:normal;font-size:12px;color:var(--sub)}
+  /* 卡片 */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+  .card{background:var(--card);border:2px solid var(--line);padding:22px;transition:.2s}
+  .card:hover{border-color:var(--green);transform:translateY(-3px)}
+  .card .ico{width:46px;height:46px;background:rgba(63,185,80,.12);border:2px solid var(--green-d);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+  .card h3{color:var(--green);font-size:17px;margin-bottom:8px}
+  .card p{color:var(--sub);font-size:14px;line-height:1.7}
+  /* 时间线 */
+  .timeline{border-left:3px solid var(--green-d);padding-left:28px}
+  .tl-item{position:relative;background:var(--card);border:2px solid var(--line);padding:16px 18px;margin-bottom:22px}
+  .tl-item::before{content:"";position:absolute;left:-37px;top:20px;width:15px;height:15px;background:var(--green);border:3px solid var(--bg)}
+  .tl-item .stage{font-size:12px;color:var(--gold);font-weight:bold;margin-bottom:5px}
+  .tl-item h4{margin-bottom:5px}
+  .tl-item p{color:var(--sub);font-size:14px;line-height:1.6}
+  /* 作品筛选 */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{padding:8px 18px;background:var(--card);border:2px solid var(--line);color:var(--sub);cursor:pointer;font-size:14px}
+  .tab.on,.tab:hover{border-color:var(--green);color:var(--green);background:rgba(63,185,80,.08)}
+  .works{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+  .work{background:var(--card);border:2px solid var(--line);overflow:hidden}
+  .work:hover{border-color:var(--gold)}
+  .work .thumb{height:150px;background:linear-gradient(135deg,var(--panel),var(--card));display:flex;align-items:center;justify-content:center;font-size:44px;position:relative;border-bottom:2px solid var(--line)}
+  .work .tag{position:absolute;top:10px;right:10px;padding:3px 10px;font-size:11px;background:var(--green-d);color:#fff}
+  .work .info{padding:15px}
+  .work .info h4{margin-bottom:5px;font-size:15px}
+  .work .info p{color:var(--sub);font-size:13px;line-height:1.5}
+  /* 团队 */
+  .team{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+  .member{background:var(--card);border:2px solid var(--line);padding:26px 18px;text-align:center}
+  .member:hover{border-color:var(--green)}
+  .avatar{width:76px;height:76px;margin:0 auto 14px;background:linear-gradient(135deg,var(--green-d),var(--green));border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;color:#fff}
+  .member h3{margin-bottom:4px}
+  .member .role{color:var(--gold);font-size:13px;margin-bottom:10px}
+  .member .desc{color:var(--sub);font-size:13px;line-height:1.6}
+  /* 联系 */
+  .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px}
+  .c-card{display:flex;gap:14px;background:var(--card);border:2px solid var(--line);padding:22px}
+  .c-card .ico{width:42px;height:42px;flex-shrink:0;background:rgba(63,185,80,.12);border:2px solid var(--green-d);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .c-card h4{color:var(--green);margin-bottom:6px}
+  .c-card p{color:var(--sub);font-size:14px;line-height:1.6}
+  .footer{text-align:center;padding:24px;color:var(--sub);font-size:13px;border-top:2px solid var(--line);margin-top:36px}
+  /* 移动端 */
+  @media(max-width:768px){
+    .burger{display:block}
+    .menu{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:var(--panel);border-bottom:3px solid var(--green);padding:8px}
+    .menu.open{display:flex}
+    .hero h1{font-size:26px}
+    .stats{gap:22px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo" onclick="go('home')"><div class="cube">街</div><span>步行街工作室</span></div>
+    <button class="burger" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
+    <ul class="menu" id="menu">
+      <li><a data-p="home" onclick="go('home')">首页</a></li>
+      <li><a data-p="about" onclick="go('about')">关于我们</a></li>
+      <li><a data-p="history" onclick="go('history')">发展历程</a></li>
+      <li><a data-p="works" onclick="go('works')">作品展示</a></li>
+      <li><a data-p="team" onclick="go('team')">团队成员</a></li>
+      <li><a data-p="contact" onclick="go('contact')">联系我们</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- 首页 -->
+  <section class="page on" id="page-home">
+    <div class="hero">
+      <h1>用方块铺成一条<span>走不完的街</span></h1>
+      <p>步行街工作室 —— 一支专注《我的世界》创作的团队，从宏大建筑、原创皮肤到指令模组，每一步都在街上留下脚印。</p>
+      <div class="stats">
+        <div class="stat"><b>3</b><i>成员账号</i></div>
+        <div class="stat"><b>3</b><i>创作板块</i></div>
+        <div class="stat"><b>多</b><i>版本适配</i></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ico">🏛</div><h3>建筑创作</h3><p>从街道场景到巨型地标，定制化建筑存档与场景方案，每一栋楼都有自己的招牌。</p></div>
+      <div class="card"><div class="ico">👤</div><h3>皮肤定制</h3><p>原创角色皮肤与皮肤文件，跨平台可直接导入使用，打造独一无二的游戏形象。</p></div>
+      <div class="card"><div class="ico">⚡</div><h3>指令与模组</h3><p>命令方块逻辑、红石系统与玩法模组，精密到每个 Tag，让玩法更上一层楼。</p></div>
+      <div class="card"><div class="ico">🔄</div><h3>多版本适配</h3><p>网易中国版、基岩版国际版、Java 版方案通用迁移，作品直达玩家的移动端。</p></div>
+    </div>
+  </section>
+
+  <!-- 关于我们 -->
+  <section class="page" id="page-about">
+    <div class="crumb">关于工作室 / <b>工作室简介</b></div>
+    <h2 class="page-title">工作室简介</h2>
+    <div class="card" style="margin-bottom:22px">
+      <h3 style="color:var(--green);margin-bottom:12px">一条街，一个方块一个方块铺出来的世界</h3>
+      <p style="color:var(--sub);line-height:1.9;font-size:15px">步行街工作室由主账号「的纯的步行街」创立，专注《我的世界》网易中国版与基岩版创作，从大型建筑到高精度指令系统，每一步都在街上留下脚印。我们相信，最好的作品不是复制模板，而是像步行街一样——每一栋楼都有自己的招牌，每一个细节都有创作者的名字。</p>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ico">🎯</div><h3>我们的使命</h3><p>让每一位玩家都能用上高质量、可直接导入的《我的世界》创作内容。</p></div>
+      <div class="card"><div class="ico">💎</div><h3>我们的坚持</h3><p>不复制模板，每件作品都有独立设计与创作者署名，追求细节极致。</p></div>
+      <div class="card"><div class="ico">🌍</div><h3>我们的范围</h3><p>建筑存档、角色皮肤、指令系统、玩法模组，覆盖创作全链路。</p></div>
+    </div>
+  </section>
+
+  <!-- 发展历程 -->
+  <section class="page" id="page-history">
+    <div class="crumb">关于工作室 / <b>发展历程</b></div>
+    <h2 class="page-title">发展历程</h2>
+    <div class="timeline">
+      <div class="tl-item"><div class="stage">起点</div><h4>主账号「的纯的步行街」诞生</h4><p>从第一座建筑开始，踏上《我的世界》创作之路。</p></div>
+      <div class="tl-item"><div class="stage">成长</div><h4>组建步行街工作室</h4><p>成立工作室账号，开启建筑、皮肤、指令的多线创作。</p></div>
+      <div class="tl-item"><div class="stage">扩展</div><h4>副账号「命令师_小亮」加入</h4><p>专注指令与模组开发，构建红石逻辑与命令方块系统。</p></div>
+      <div class="tl-item"><div class="stage">现在</div><h4>多版本 · 全平台创作</h4><p>覆盖网易中国版与基岩版国际版，作品直达玩家的移动端。</p></div>
+    </div>
+  </section>
+
+  <!-- 作品展示 -->
+  <section class="page" id="page-works">
+    <div class="crumb">作品展示 / <b id="workCrumb">全部作品</b></div>
+    <h2 class="page-title">作品展示</h2>
+    <div class="tabs">
+      <div class="tab on" data-c="all" onclick="filterWorks('all')">全部</div>
+      <div class="tab" data-c="build" onclick="filterWorks('build')">建筑作品</div>
+      <div class="tab" data-c="skin" onclick="filterWorks('skin')">皮肤作品</div>
+      <div class="tab" data-c="mod" onclick="filterWorks('mod')">指令模组</div>
+    </div>
+    <div class="works" id="worksBox">
+      <div class="work" data-c="build"><div class="thumb">🏰<span class="tag">建筑</span></div><div class="info"><h4>步行街主街场景</h4><p>还原步行街夜景，两侧店铺林立，绿宝石传送门作为街道终点地标。</p></div></div>
+      <div class="work" data-c="build"><div class="thumb">🏡<span class="tag">建筑</span></div><div class="info"><h4>庄园建筑群</h4><p>大型欧式庄园，包含主楼、花园、马厩与地下密室，可直接导入存档。</p></div></div>
+      <div class="work" data-c="build"><div class="thumb">🚇<span class="tag">建筑</span></div><div class="info"><h4>地铁逃生大厅</h4><p>末日风格地铁站场景，适合逃生类玩法地图，含红石机关与隐藏通道。</p></div></div>
+      <div class="work" data-c="skin"><div class="thumb">🧑‍🚀<span class="tag">皮肤</span></div><div class="info"><h4>虚空娘系列皮肤</h4><p>科幻风格原创角色皮肤，深空配色与发光细节，基岩版/Java版通用。</p></div></div>
+      <div class="work" data-c="skin"><div class="thumb">⚔️<span class="tag">皮肤</span></div><div class="info"><h4>冒险者铠甲皮肤</h4><p>铁甲战士风格皮肤，钻石剑搭配，适合生存模式角色扮演。</p></div></div>
+      <div class="work" data-c="skin"><div class="thumb">🎭<span class="tag">皮肤</span></div><div class="info"><h4>定制角色皮肤</h4><p>接受个性化定制，提供 PNG 皮肤文件，可直接导入游戏使用。</p></div></div>
+      <div class="work" data-c="mod"><div class="thumb">📜<span class="tag">指令</span></div><div class="info"><h4>记分板控制系统</h4><p>完整的记分板管理指令包，支持玩家数据统计、排行榜与奖励发放。</p></div></div>
+      <div class="work" data-c="mod"><div class="thumb">🔄<span class="tag">指令</span></div><div class="info"><h4>Tag 循环判定系统</h4><p>基于实体 Tag 的循环逻辑，适配基岩版，含强刷新机制调试方案。</p></div></div>
+      <div class="work" data-c="mod"><div class="thumb">🎵<span class="tag">模组</span></div><div class="info"><h4>指令音乐包</h4><p>用命令方块演奏完整曲目，含音符盒时序与红石布线。</p></div></div>
+    </div>
+  </section>
+
+  <!-- 团队成员 -->
+  <section class="page" id="page-team">
+    <div class="crumb">团队成员</div>
+    <h2 class="page-title">团队成员</h2>
+    <div class="team">
+      <div class="member"><div class="avatar">纯</div><h3>的纯的步行街</h3><div class="role">创始人 / 主账号</div><p class="desc">工作室创立者，专注大型建筑设计与场景搭建，步行街系列作品的主创作者。</p></div>
+      <div class="member"><div class="avatar">亮</div><h3>命令师_小亮</h3><div class="role">指令工程师 / 副账号</div><p class="desc">专注命令方块逻辑、红石系统与玩法模组开发，精密到每个 Tag 的指令大师。</p></div>
+      <div class="member"><div class="avatar">街</div><h3>步行街工作室</h3><div class="role">官方账号 / 工作室</div><p class="desc">工作室官方发布账号，统一发布作品、更新公告与玩家互动内容。</p></div>
+    </div>
+  </section>
+
+  <!-- 联系我们 -->
+  <section class="page" id="page-contact">
+    <div class="crumb">联系我们</div>
+    <h2 class="page-title">联系我们</h2>
+    <div class="contact">
+      <div class="c-card"><div class="ico">🎮</div><div><h4>《我的世界》账号</h4><p>主账号：的纯的步行街<br>副账号：命令师_小亮<br>工作室：步行街工作室</p></div></div>
+      <div class="c-card"><div class="ico">🌐</div><div><h4>官方网站</h4><p>步行街工作室官网<br>作品发布与更新公告</p></div></div>
+      <div class="c-card"><div class="ico">💬</div><div><h4>在线交流</h4><p>使用本站聊天室功能<br>与工作室成员实时沟通</p></div></div>
+      <div class="c-card"><div class="ico">📦</div><div><h4>作品获取</h4><p>建筑存档、皮肤文件、指令包<br>可直接导入网易版 / 基岩版</p></div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">© 2026 步行街工作室 Walking Street Studio · 用方块铺成一条走不完的街</div>
+
+<script>
+function go(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('on'));
+  const link=document.querySelector('.menu a[data-p="'+p+'"]');
+  if(link) link.classList.add('on');
+  document.getElementById('menu').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function filterWorks(c){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('.tab[data-c="'+c+'"]').classList.add('on');
+  document.querySelectorAll('.work').forEach(w=>{
+    w.style.display=(c==='all'||w.dataset.c===c)?'':'none';
+  });
+  const names={all:'全部作品',build:'建筑作品',skin:'皮肤作品',mod:'指令模组'};
+  document.getElementById('workCrumb').textContent=names[c];
+}
+</script>
+</body>
+</html>
